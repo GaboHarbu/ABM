@@ -30,6 +30,9 @@ def ingresar_datos(mensaje, validador):
             print("Entrada no válida. Intente de nuevo.")
 
 def alta_venta():
+
+    estado_logico = 1 # (tomi) le agregue el estado para hacer borrado logico
+    
     date_time = datetime.datetime.now()
     date_time_str = date_time.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -38,7 +41,7 @@ def alta_venta():
     
     importe = ingresar_datos("Ingrese el importe: ", validar_numero)
 
-    nueva_venta = [date_time_str, sucursal, producto, float(importe)]
+    nueva_venta = [estado_logico, date_time_str, sucursal, producto, float(importe)]
 
     with open("Ventas.csv", mode="a", newline="") as file:
         writer = csv.writer(file)
@@ -50,8 +53,78 @@ def alta_venta():
 def baja_venta():
     pass
 
+
 def modificacion_venta():
-    pass
+    print("\n\033[1mModificaciones\033[0m")
+    with open("Ventas.csv", mode="r+", newline="") as arch:
+    
+        campos_modificables = ["sucursal","producto","importe"]         
+        
+        arch.seek(0)
+        posant = 0
+           
+        linea = arch.readline()
+        
+        elegido = False
+        
+        while linea and not elegido:
+            
+            venta = list(linea.strip().split(","))
+            
+            if venta[0] == "0": #si el estado es 0, esta borrado logicamente y no deberia mostrarse
+                posant = arch.tell()
+                linea = arch.readline()
+            else:
+                while True: 
+                    try:
+                        print("\n",linea)
+                        print("1. \033[1mSiguiente Linea\033[0m")
+                        print("2. \033[1mModificar\033[0m")
+                        n = int(input("Ingrese opción => ")) 
+                        assert n==1 or n==2 
+                        break
+                    except ValueError: #se pueder evitar con n siendo str y simplemente validar que no sea "1" o "2"
+                        print("\nIngreso invalido, el valor debe ser 1 o 2")
+                    except AssertionError:
+                        print("\nIngreso invalido, el valor debe ser 1 o 2")
+                    
+                if n==1:
+                    posant = arch.tell()
+                    linea = arch.readline()
+                    
+                if n==2:
+                    campo = input("\n¿Qué campo desea modificar? ").lower() # tambien se podria hacer como un menu
+                    while campo not in campos_modificables:
+                        print("\nCampo invalido, los campos modificables son:",end =' ')
+                        print(*(campos_modificables),sep=', ')
+                        campo = input("¿Qué campo desea modificar? ")
+                        
+                    indice_campo = campos_modificables.index(campo) + 2 #existen estado_logico y datetime pero no se modifican
+                    
+                    print("\nCampo actual:",venta[indice_campo])
+                    
+                    if campo == "sucursal":
+                        modif = ingresar_datos("Ingrese la sucursal: ", validar_palabra)
+                    elif campo == "producto":
+                        modif = ingresar_datos("Ingrese el producto: ", validar_palabra)
+                    elif campo =="importe":
+                        modif = float(ingresar_datos("Ingrese el importe: ", validar_numero))
+                    
+                    venta[indice_campo] = modif
+                    
+                    elegido = True
+        
+        if elegido:
+            arch.seek(posant)
+            writer = csv.writer(arch)
+            writer.writerow(venta)
+            print("\nModificación exitosa")
+            input("Presione una tecla para volver al Menú ")
+                    
+        else:
+            print("\nNo hay mas registros")
+            input("Presione una tecla para volver al Menú ")
+
 
 def listado_ventas():
     pass
