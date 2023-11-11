@@ -9,7 +9,7 @@ def generar_archivo():
     except FileNotFoundError:
         with open("Ventas.csv", mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Fecha y Hora", "Sucursal", "Producto", "Importe"])
+            writer.writerow(["Estado", "Fecha y Hora", "Sucursal", "Producto", "Importe"]) # Mili, le agregue el estado, sino no se deberia mostrar este campo en el listado
 
 def validar_numero(entrada):
     try:
@@ -51,8 +51,49 @@ def alta_venta():
     print()
 
 def baja_venta():
-    pass
-
+    print("\n\033[1mBorrado\033[0m")
+    with open("Ventas.csv", mode="r+", newline="") as arch:
+        arch.seek(0)
+        posant = 0
+        linea = arch.readline()
+        Borrado = False
+        while linea and not Borrado:
+            
+            venta = list(linea.strip().split(","))
+            
+            if venta[0] == "0": #Si quieren cambiar esto avisenme y vemos de borrar el archivo y generar uno nuevo pero estaria bueno agregar una funcion de recuperar borrados
+                posant = arch.tell()
+                linea = arch.readline()
+            else:
+                while True: 
+                    try:
+                        print("\n",linea)
+                        print("1. \033[1mSiguiente Linea\033[0m")
+                        print("2. \033[1mBorrar\033[0m")
+                        n = int(input("Ingrese opción => ")) 
+                        assert n==1 or n==2 
+                        break
+                    except ValueError: 
+                        print("\nIngreso invalido, el valor debe ser 1 o 2")
+                    except AssertionError:
+                        print("\nIngreso invalido, el valor debe ser 1 o 2")
+                    
+                if n==1:
+                    posant = arch.tell()
+                    linea = arch.readline()
+                if n==2:
+                    modif = 0
+                    venta[0] = modif
+                    Borrado = True
+        if Borrado:
+            arch.seek(posant)
+            writer = csv.writer(arch)
+            writer.writerow(venta)
+            print("\nBorrado exitoso")
+            print()        
+        else:
+            print("\nNo hay mas registros")
+            print()
 
 def modificacion_venta():
     print("\n\033[1mModificaciones\033[0m")
@@ -125,9 +166,15 @@ def modificacion_venta():
             print("\nNo hay mas registros")
             input("Presione una tecla para volver al Menú ")
 
-
 def listado_ventas():
-    pass
+    with open("Ventas.csv", mode="r+", newline="") as arch:
+        arch.seek(0)
+        for linea in arch:
+            venta = list(linea.strip().split(","))
+            if venta[0] != "0":
+                print(linea.strip())
+        print("\nNo hay mas registros")
+        input("Presione enter para volver al Menú ")
 
 def listado_ventas_por_producto():
     pass
