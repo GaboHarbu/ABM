@@ -169,11 +169,17 @@ def modificacion_venta():
 def listado_ventas():
     with open("Ventas.csv", mode="r+", newline="") as arch:
         arch.seek(0)
+        ventas = []  # Lista para almacenar las ventas y luego ordenarlas en orden desc
         for linea in arch:
             venta = list(linea.strip().split(","))
             if venta[0] != "0":
-                print(linea.strip())
-        print("\nNo hay mas registros")
+                ventas.append(linea.strip())
+        # Ordenar las ventas por la columna de fecha en orden descendente - la ultima primero
+        ventas_ordenadas = sorted(ventas, key=lambda x: x.split(",")[1], reverse=True)  #con fecha en pos 1, porque la pos 0 es el estado
+        for venta in ventas_ordenadas:
+            print(venta)
+
+        print("\nNo hay más registros")
         input("Presione enter para volver al Menú ")
 
 def listado_ventas_por_producto():
