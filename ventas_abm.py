@@ -186,7 +186,34 @@ def listado_ventas_por_producto():
     pass
 
 def listado_ventas_por_producto_ordenado_por_suma():
-    pass
+    ventas_por_producto = {}  # Dictionary to store total sales for each product
+
+    with open("Ventas.csv", mode="r", newline="") as arch:
+        arch.seek(0)
+
+        # Skip the header line
+        next(arch)
+
+        for linea in arch:
+            venta = list(linea.strip().split(","))
+            if venta[0] != "0":
+                producto = venta[3]
+                importe = float(venta[4])
+
+                # Update the total sales for the product in the dictionary
+                ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + importe
+
+    # Order products by total sales in descending order
+    productos_ordenados = sorted(ventas_por_producto.items(), key=lambda x: x[1], reverse=True)
+
+    # Print the result
+    print("{:<20} {:<15}".format("Producto", "Total de Ventas"))
+    for producto, total_ventas in productos_ordenados:
+        print("{:<20} ${:<15,.2f}".format(producto, total_ventas))
+
+    print("\nNo hay más registros")
+    input("Presione enter para volver al Menú ")
+
 
 def main():
     generar_archivo()
