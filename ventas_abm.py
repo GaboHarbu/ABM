@@ -183,15 +183,12 @@ def listado_ventas():
         input("Presione enter para volver al Menú ")
 
 def listado_ventas_por_producto():
-    pass
-
-def listado_ventas_por_producto_ordenado_por_suma():
-    ventas_por_producto = {}  # Dictionary to store total sales for each product
+    ventas_por_producto = {}  # Diccionario de los productos
 
     with open("Ventas.csv", mode="r", newline="") as arch:
         arch.seek(0)
 
-        # Skip the header line
+        # Salteo
         next(arch)
 
         for linea in arch:
@@ -200,14 +197,43 @@ def listado_ventas_por_producto_ordenado_por_suma():
                 producto = venta[3]
                 importe = float(venta[4])
 
-                # Update the total sales for the product in the dictionary
+                # Actualizar el total de ventas para el producto
                 ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + importe
 
-    # Order products by total sales in descending order
+    # Ordenar los productos por la cantidad de ventas en orden descendente
     productos_ordenados = sorted(ventas_por_producto.items(), key=lambda x: x[1], reverse=True)
 
-    # Print the result
-    print("{:<20} {:<15}".format("Producto", "Total de Ventas"))
+    # Imprimir los productos ordenados
+    print("{:<20} {:<15}".format("Producto", "Total de ventas"))
+    for producto, total_ventas in productos_ordenados:
+        print("{:<20} ${:<15,.2f}".format(producto, total_ventas))
+
+    print("\nNo hay más registros")
+    input("Presione enter para volver al Menú ")
+
+def listado_ventas_por_producto_ordenado_por_suma():
+    ventas_por_producto = {}  # Diccionario de los productos
+
+    with open("Ventas.csv", mode="r", newline="") as arch:
+        arch.seek(0)
+
+        # Salteo
+        next(arch)
+
+        for linea in arch:
+            venta = list(linea.strip().split(","))
+            if venta[0] != "0":
+                producto = venta[3]
+                importe = float(venta[4])
+
+                # Actualizar los ingresos totales para el producto
+                ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + importe
+
+    # Ordenar los productos por la suma de sus ventas en orden descendente
+    productos_ordenados = sorted(ventas_por_producto.items(), key=lambda x: x[1], reverse=True)
+
+    # Imprimir los productos ordenados
+    print("{:<20} {:<15}".format("Producto", "Ingresos totales"))
     for producto, total_ventas in productos_ordenados:
         print("{:<20} ${:<15,.2f}".format(producto, total_ventas))
 
