@@ -9,7 +9,7 @@ def generar_archivo():
     except FileNotFoundError:
         with open("Ventas.csv", mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Estado", "Fecha y Hora", "Sucursal", "Producto", "Importe"]) # Mili, le agregue el estado, sino no se deberia mostrar este campo en el listado
+            writer.writerow(["Estado", "Fecha y Hora", "Sucursal", "Producto", "Importe"])
 
 def validar_numero(entrada):
     try:
@@ -31,7 +31,7 @@ def ingresar_datos(mensaje, validador):
 
 def alta_venta():
 
-    estado_logico = 1 # (tomi) le agregue el estado para hacer borrado logico
+    estado_logico = 1 
     
     date_time = datetime.datetime.now()
     date_time_str = date_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -61,7 +61,10 @@ def baja_venta():
             
             venta = list(linea.strip().split(","))
             
-            if venta[0] == "0": #Si quieren cambiar esto avisenme y vemos de borrar el archivo y generar uno nuevo pero estaria bueno agregar una funcion de recuperar borrados
+            if venta[0] == "0": 
+                posant = arch.tell()
+                linea = arch.readline()
+            elif posant == 0: 
                 posant = arch.tell()
                 linea = arch.readline()
             else:
@@ -112,7 +115,10 @@ def modificacion_venta():
             
             venta = list(linea.strip().split(","))
             
-            if venta[0] == "0": #si el estado es 0, esta borrado logicamente y no deberia mostrarse
+            if venta[0] == "0": 
+                posant = arch.tell()
+                linea = arch.readline()
+            elif posant == 0: 
                 posant = arch.tell()
                 linea = arch.readline()
             else:
@@ -124,7 +130,7 @@ def modificacion_venta():
                         n = int(input("Ingrese opción => ")) 
                         assert n==1 or n==2 
                         break
-                    except ValueError: #se pueder evitar con n siendo str y simplemente validar que no sea "1" o "2"
+                    except ValueError: 
                         print("\nIngreso invalido, el valor debe ser 1 o 2")
                     except AssertionError:
                         print("\nIngreso invalido, el valor debe ser 1 o 2")
@@ -134,13 +140,13 @@ def modificacion_venta():
                     linea = arch.readline()
                     
                 if n==2:
-                    campo = input("\n¿Qué campo desea modificar? ").lower() # tambien se podria hacer como un menu
+                    campo = input("\n¿Qué campo desea modificar? ").lower() 
                     while campo not in campos_modificables:
                         print("\nCampo invalido, los campos modificables son:",end =' ')
                         print(*(campos_modificables),sep=', ')
                         campo = input("¿Qué campo desea modificar? ")
                         
-                    indice_campo = campos_modificables.index(campo) + 2 #existen estado_logico y datetime pero no se modifican
+                    indice_campo = campos_modificables.index(campo) + 2
                     
                     print("\nCampo actual:",venta[indice_campo])
                     
@@ -169,13 +175,13 @@ def modificacion_venta():
 def listado_ventas():
     with open("Ventas.csv", mode="r+", newline="") as arch:
         arch.seek(0)
-        ventas = []  # Lista para almacenar las ventas y luego ordenarlas en orden desc
+        ventas = []  
         for linea in arch:
             venta = list(linea.strip().split(","))
             if venta[0] != "0":
                 ventas.append(linea.strip())
-        # Ordenar las ventas por la columna de fecha en orden descendente - la ultima primero
-        ventas_ordenadas = sorted(ventas, key=lambda x: x.split(",")[1], reverse=True)  #con fecha en pos 1, porque la pos 0 es el estado
+        
+        ventas_ordenadas = sorted(ventas, key=lambda x: x.split(",")[1], reverse=True)  
         for venta in ventas_ordenadas:
             print(venta)
 
@@ -183,26 +189,22 @@ def listado_ventas():
         input("Presione enter para volver al Menú ")
 
 def listado_ventas_por_producto():
-    ventas_por_producto = {}  # Diccionario de los productos
+    ventas_por_producto = {}  
 
     with open("Ventas.csv", mode="r", newline="") as arch:
         arch.seek(0)
-
-        # Salteo
+        
         next(arch)
 
         for linea in arch:
             venta = list(linea.strip().split(","))
             if venta[0] != "0":
                 producto = venta[3]
-
-                # Actualizar el total de ventas para el producto
+                
                 ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + 1
 
-    # Ordenar los productos por la cantidad de ventas en orden descendente
     productos_ordenados = sorted(ventas_por_producto.items(), key=lambda x: x[1], reverse=True)
 
-    # Imprimir los productos ordenados
     print("{:<20} {:<15}".format("Producto", "Cantidad de ventas"))
     for producto, total_ventas in productos_ordenados:
         print("{:<20} {:<15}".format(producto, total_ventas))
@@ -212,12 +214,11 @@ def listado_ventas_por_producto():
         
         
 def listado_ventas_por_producto_ordenado_por_suma():
-    ventas_por_producto = {}  # Diccionario de los productos
+    ventas_por_producto = {}  
 
     with open("Ventas.csv", mode="r", newline="") as arch:
         arch.seek(0)
-
-        # Salteo
+        
         next(arch)
 
         for linea in arch:
@@ -226,13 +227,10 @@ def listado_ventas_por_producto_ordenado_por_suma():
                 producto = venta[3]
                 importe = float(venta[4])
 
-                # Actualizar los ingresos totales para el producto
                 ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + importe
 
-    # Ordenar los productos por la suma de sus ventas en orden descendente
     productos_ordenados = sorted(ventas_por_producto.items(), key=lambda x: x[1], reverse=True)
 
-    # Imprimir los productos ordenados
     print("{:<20} {:<15}".format("Producto", "Ingresos totales"))
     for producto, total_ventas in productos_ordenados:
         print("{:<20} ${:<15,.2f}".format(producto, total_ventas))
