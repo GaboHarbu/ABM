@@ -195,22 +195,22 @@ def listado_ventas_por_producto():
             venta = list(linea.strip().split(","))
             if venta[0] != "0":
                 producto = venta[3]
-                importe = float(venta[4])
 
                 # Actualizar el total de ventas para el producto
-                ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + importe
+                ventas_por_producto[producto] = ventas_por_producto.get(producto, 0) + 1
 
     # Ordenar los productos por la cantidad de ventas en orden descendente
     productos_ordenados = sorted(ventas_por_producto.items(), key=lambda x: x[1], reverse=True)
 
     # Imprimir los productos ordenados
-    print("{:<20} {:<15}".format("Producto", "Total de ventas"))
+    print("{:<20} {:<15}".format("Producto", "Cantidad de ventas"))
     for producto, total_ventas in productos_ordenados:
-        print("{:<20} ${:<15,.2f}".format(producto, total_ventas))
+        print("{:<20} {:<15}".format(producto, total_ventas))
 
     print("\nNo hay más registros")
     input("Presione enter para volver al Menú ")
-
+        
+        
 def listado_ventas_por_producto_ordenado_por_suma():
     ventas_por_producto = {}  # Diccionario de los productos
 
